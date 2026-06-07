@@ -1,0 +1,1950 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EcoVol — Hệ Thống Quản Lý Tình Nguyện Viên Môi Trường</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  :root {
+    --green-50: #EAF3DE; --green-100: #C0DD97; --green-200: #97C459;
+    --green-400: #639922; --green-600: #3B6D11; --green-800: #27500A; --green-900: #173404;
+    --teal-50: #E1F5EE; --teal-100: #9FE1CB; --teal-200: #5DCAA5;
+    --teal-400: #1D9E75; --teal-600: #0F6E56; --teal-800: #085041; --teal-900: #04342C;
+    --amber-50: #FAEEDA; --amber-100: #FAC775; --amber-200: #EF9F27;
+    --amber-400: #BA7517; --amber-600: #854F0B; --amber-800: #633806;
+    --coral-50: #FAECE7; --coral-100: #F5C4B3; --coral-200: #F0997B;
+    --coral-400: #D85A30; --coral-600: #993C1D; --coral-800: #712B13;
+    --blue-50: #E6F1FB; --blue-100: #B5D4F4; --blue-400: #378ADD; --blue-600: #185FA5;
+    --red-50: #FCEBEB; --red-100: #F7C1C1; --red-400: #E24B4A; --red-600: #A32D2D;
+    --gray-50: #F1EFE8; --gray-100: #D3D1C7; --gray-200: #B4B2A9;
+    --gray-400: #888780; --gray-600: #5F5E5A; --gray-800: #444441; --gray-900: #2C2C2A;
+    --bg: #f8faf6;
+    --sidebar-bg: #1a2e1a;
+    --sidebar-text: #c8e6c0;
+    --card-bg: #ffffff;
+    --text-primary: #1a2e1a;
+    --text-secondary: #4a6741;
+    --text-muted: #7a9b75;
+    --border: #d4e8cc;
+    --shadow: 0 1px 3px rgba(26,46,26,0.08);
+    --shadow-md: 0 4px 16px rgba(26,46,26,0.12);
+    --radius: 10px;
+    --radius-lg: 14px;
+    --font-main: 'Be Vietnam Pro', sans-serif;
+    --font-display: 'Space Grotesk', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-main); background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 240px; min-height: 100vh; background: var(--sidebar-bg);
+    display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0;
+    z-index: 100; transition: all 0.3s;
+  }
+  .sidebar-logo {
+    padding: 24px 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .sidebar-logo .logo-icon {
+    width: 36px; height: 36px; background: var(--green-400); border-radius: 9px;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 10px;
+    font-size: 18px;
+  }
+  .sidebar-logo h1 { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: #fff; }
+  .sidebar-logo p { font-size: 11px; color: var(--sidebar-text); opacity: 0.6; margin-top: 2px; }
+
+  .sidebar-role {
+    margin: 12px 16px; padding: 8px 12px;
+    background: rgba(255,255,255,0.07); border-radius: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .role-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green-200); flex-shrink: 0; }
+  .role-label { font-size: 11px; color: var(--sidebar-text); opacity: 0.8; font-weight: 500; }
+  .role-name { font-size: 12px; color: #fff; font-weight: 600; }
+
+  .sidebar-nav { flex: 1; padding: 8px 0; overflow-y: auto; }
+  .nav-section-label {
+    font-size: 10px; font-weight: 600; color: var(--sidebar-text); opacity: 0.4;
+    letter-spacing: 0.08em; padding: 16px 20px 6px; text-transform: uppercase;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 20px;
+    color: var(--sidebar-text); font-size: 13.5px; font-weight: 400;
+    cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent;
+    text-decoration: none; position: relative;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+  .nav-item.active { background: rgba(99,153,34,0.2); color: #fff; border-left-color: var(--green-200); font-weight: 500; }
+  .nav-item i { width: 18px; text-align: center; font-size: 14px; }
+  .nav-badge {
+    margin-left: auto; background: var(--coral-400); color: #fff;
+    font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px;
+  }
+
+  .sidebar-footer {
+    padding: 16px; border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .user-card {
+    display: flex; align-items: center; gap: 10px; padding: 10px;
+    background: rgba(255,255,255,0.06); border-radius: 9px; cursor: pointer;
+  }
+  .user-avatar {
+    width: 34px; height: 34px; border-radius: 50%; background: var(--green-400);
+    display: flex; align-items: center; justify-content: center; font-size: 13px;
+    font-weight: 600; color: #fff; flex-shrink: 0;
+  }
+  .user-name { font-size: 13px; font-weight: 500; color: #fff; }
+  .user-role { font-size: 11px; color: var(--sidebar-text); opacity: 0.6; }
+
+  /* ── MAIN ── */
+  .main { margin-left: 240px; flex: 1; min-height: 100vh; display: flex; flex-direction: column; }
+  .topbar {
+    height: 60px; background: var(--card-bg); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 28px; gap: 16px; position: sticky; top: 0; z-index: 50;
+  }
+  .topbar-title { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--text-primary); flex: 1; }
+  .topbar-search {
+    display: flex; align-items: center; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 0 12px; gap: 8px; width: 220px;
+  }
+  .topbar-search input {
+    border: none; background: transparent; outline: none; font-size: 13px;
+    color: var(--text-primary); font-family: var(--font-main); width: 100%; padding: 7px 0;
+  }
+  .topbar-search i { color: var(--text-muted); font-size: 13px; }
+  .topbar-actions { display: flex; align-items: center; gap: 8px; }
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border);
+    background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: var(--text-secondary); transition: all 0.2s; position: relative;
+  }
+  .icon-btn:hover { background: var(--bg); color: var(--text-primary); }
+  .notif-dot {
+    position: absolute; top: 6px; right: 6px; width: 6px; height: 6px;
+    background: var(--coral-400); border-radius: 50%;
+  }
+
+  .content { flex: 1; padding: 28px; }
+
+  /* ── ROLE SWITCHER ── */
+  .role-switcher {
+    display: flex; gap: 8px; margin-bottom: 24px; background: var(--card-bg);
+    border: 1px solid var(--border); border-radius: 10px; padding: 6px;
+    width: fit-content;
+  }
+  .role-btn {
+    padding: 7px 18px; border-radius: 7px; font-size: 13px; font-weight: 500;
+    cursor: pointer; border: none; transition: all 0.2s; font-family: var(--font-main);
+    color: var(--text-secondary); background: transparent;
+  }
+  .role-btn.active { background: var(--green-600); color: #fff; }
+
+  /* ── VIEWS ── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ── STAT CARDS ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+  .stat-card {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 18px 20px; position: relative; overflow: hidden;
+  }
+  .stat-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+  .stat-card.green::before { background: var(--green-400); }
+  .stat-card.teal::before { background: var(--teal-400); }
+  .stat-card.amber::before { background: var(--amber-200); }
+  .stat-card.coral::before { background: var(--coral-400); }
+  .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; }
+  .stat-value { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--text-primary); }
+  .stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+  .stat-icon {
+    position: absolute; top: 16px; right: 16px; width: 36px; height: 36px;
+    border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .stat-icon.green { background: var(--green-50); color: var(--green-600); }
+  .stat-icon.teal { background: var(--teal-50); color: var(--teal-600); }
+  .stat-icon.amber { background: var(--amber-50); color: var(--amber-600); }
+  .stat-icon.coral { background: var(--coral-50); color: var(--coral-600); }
+
+  /* ── TABLE ── */
+  .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+  .card-header {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .card-title { font-size: 14px; font-weight: 600; color: var(--text-primary); flex: 1; }
+  .card-body { padding: 0; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    text-align: left; padding: 11px 16px; font-size: 11px; font-weight: 600;
+    color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--border); background: var(--bg);
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--green-50); }
+  td { padding: 12px 16px; font-size: 13.5px; color: var(--text-primary); vertical-align: middle; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px;
+    border-radius: 99px; font-size: 11.5px; font-weight: 500;
+  }
+  .badge.active { background: var(--green-50); color: var(--green-800); }
+  .badge.pending { background: var(--amber-50); color: var(--amber-600); }
+  .badge.inactive { background: var(--gray-50); color: var(--gray-600); }
+  .badge.completed { background: var(--teal-50); color: var(--teal-800); }
+  .badge.suspended { background: var(--red-50); color: var(--red-600); }
+
+  .avatar-group { display: flex; align-items: center; gap: 8px; }
+  .avatar {
+    width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0;
+  }
+  .avatar.green { background: var(--green-100); color: var(--green-800); }
+  .avatar.teal { background: var(--teal-100); color: var(--teal-800); }
+  .avatar.amber { background: var(--amber-50); color: var(--amber-600); }
+  .avatar.coral { background: var(--coral-50); color: var(--coral-600); }
+  .avatar.blue { background: var(--blue-50); color: var(--blue-600); }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px;
+    border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer;
+    border: 1px solid transparent; transition: all 0.2s; font-family: var(--font-main);
+  }
+  .btn-primary { background: var(--green-600); color: #fff; border-color: var(--green-600); }
+  .btn-primary:hover { background: var(--green-800); }
+  .btn-secondary { background: transparent; color: var(--text-secondary); border-color: var(--border); }
+  .btn-secondary:hover { background: var(--bg); }
+  .btn-danger { background: transparent; color: var(--red-600); border-color: var(--red-100); }
+  .btn-danger:hover { background: var(--red-50); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .btn-icon { padding: 7px; }
+
+  .action-btns { display: flex; align-items: center; gap: 6px; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+    z-index: 200; align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--card-bg); border-radius: var(--radius-lg); width: 520px; max-width: 95vw;
+    max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-md);
+  }
+  .modal-header {
+    padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .modal-header h3 { font-size: 16px; font-weight: 600; flex: 1; }
+  .modal-body { padding: 20px 24px; }
+  .modal-footer {
+    padding: 16px 24px; border-top: 1px solid var(--border);
+    display: flex; justify-content: flex-end; gap: 10px;
+  }
+
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 12.5px; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px; }
+  .form-control {
+    width: 100%; padding: 9px 13px; border: 1px solid var(--border); border-radius: 8px;
+    font-size: 13.5px; font-family: var(--font-main); color: var(--text-primary);
+    background: var(--bg); outline: none; transition: border 0.2s;
+  }
+  .form-control:focus { border-color: var(--green-400); background: #fff; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  select.form-control { cursor: pointer; }
+  textarea.form-control { resize: vertical; min-height: 80px; }
+
+  /* ── PROGRESS ── */
+  .progress-bar { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 99px; background: var(--green-400); transition: width 0.5s; }
+
+  /* ── SPONSOR VIEW ── */
+  .sponsor-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+  .sponsor-stat {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px;
+    text-align: center;
+  }
+  .sponsor-stat-icon { font-size: 28px; margin-bottom: 8px; }
+  .sponsor-stat-value { font-family: var(--font-display); font-size: 24px; font-weight: 700; color: var(--text-primary); }
+  .sponsor-stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+  .project-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .project-card {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .project-card:hover { box-shadow: var(--shadow-md); border-color: var(--green-200); }
+  .project-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+  .project-card-title { font-size: 14.5px; font-weight: 600; color: var(--text-primary); }
+  .project-card-meta { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+  .project-card-body { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px; }
+  .project-card-footer { display: flex; align-items: center; justify-content: space-between; }
+  .mini-stats { display: flex; gap: 14px; }
+  .mini-stat { font-size: 12px; color: var(--text-muted); }
+  .mini-stat span { font-weight: 600; color: var(--text-primary); }
+
+  /* ── SECTION HEADER ── */
+  .section-header { display: flex; align-items: center; margin-bottom: 18px; gap: 12px; }
+  .section-title { font-family: var(--font-display); font-size: 18px; font-weight: 600; color: var(--text-primary); flex: 1; }
+
+  /* ── TOAST ── */
+  .toast-container { position: fixed; top: 16px; right: 16px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+  .toast {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 16px; display: flex; align-items: center; gap: 10px; font-size: 13.5px;
+    box-shadow: var(--shadow-md); min-width: 260px; animation: slideIn 0.3s ease;
+  }
+  .toast.success { border-left: 3px solid var(--green-400); }
+  .toast.error { border-left: 3px solid var(--coral-400); }
+  @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+  /* ── FILTER BAR ── */
+  .filter-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .filter-select {
+    padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px;
+    font-size: 13px; font-family: var(--font-main); background: var(--card-bg);
+    color: var(--text-secondary); outline: none; cursor: pointer;
+  }
+  .search-input {
+    padding: 7px 12px 7px 34px; border: 1px solid var(--border); border-radius: 8px;
+    font-size: 13px; font-family: var(--font-main); background: var(--card-bg);
+    color: var(--text-primary); outline: none; flex: 1; min-width: 180px;
+    position: relative;
+  }
+  .search-wrap { position: relative; flex: 1; min-width: 180px; }
+  .search-wrap i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 13px; }
+  .search-wrap input { padding: 7px 12px 7px 32px; }
+
+  /* Delete confirm */
+  .confirm-modal { width: 380px; }
+  .confirm-icon { width: 52px; height: 52px; background: var(--red-50); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--red-600); margin: 0 auto 14px; }
+
+  /* Empty */
+  .empty-state { text-align: center; padding: 48px; color: var(--text-muted); }
+  .empty-state i { font-size: 36px; margin-bottom: 12px; display: block; }
+  .empty-state p { font-size: 14px; }
+
+  /* Report section */
+  .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .report-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; }
+  .report-card h4 { font-size: 13.5px; font-weight: 600; margin-bottom: 14px; color: var(--text-primary); }
+  .report-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .report-row:last-child { border-bottom: none; }
+  .report-row .label { color: var(--text-secondary); }
+  .report-row .value { font-weight: 600; color: var(--text-primary); }
+
+  /* Activity feed */
+  .activity-feed { display: flex; flex-direction: column; gap: 0; }
+  .activity-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+  .activity-dot.green { background: var(--green-400); }
+  .activity-dot.amber { background: var(--amber-200); }
+  .activity-dot.coral { background: var(--coral-400); }
+  .activity-dot.teal { background: var(--teal-400); }
+  .activity-text { font-size: 13px; color: var(--text-primary); line-height: 1.5; }
+  .activity-time { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Map placeholder */
+  .map-placeholder {
+    height: 180px; background: linear-gradient(135deg, var(--green-50) 0%, var(--teal-50) 100%);
+    border-radius: var(--radius); display: flex; align-items: center; justify-content: center;
+    color: var(--green-600); font-size: 13px; border: 1px dashed var(--green-200);
+    flex-direction: column; gap: 6px; margin-bottom: 16px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .project-cards { grid-template-columns: 1fr; }
+    .sponsor-grid { grid-template-columns: repeat(2, 1fr); }
+    .report-grid { grid-template-columns: 1fr; }
+  }
+
+  .two-col { display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; }
+  @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+  .text-right { text-align: right; }
+  .text-center { text-align: center; }
+  .mt-20 { margin-top: 20px; }
+  .gap-4 { gap: 4px; }
+  .flex { display: flex; }
+  .items-center { align-items: center; }
+
+  .highlight-text { color: var(--green-600); font-weight: 600; }
+  .currency { font-family: var(--font-display); }
+
+  /* ── USER / VOLUNTEER VIEW ── */
+  .hero-banner {
+    background: linear-gradient(135deg, var(--green-800) 0%, var(--teal-600) 100%);
+    border-radius: var(--radius-lg); padding: 28px 32px; margin-bottom: 24px;
+    display: flex; align-items: center; gap: 24px; position: relative; overflow: hidden;
+  }
+  .hero-banner::before {
+    content: '🌿'; position: absolute; right: 24px; top: 50%; transform: translateY(-50%);
+    font-size: 80px; opacity: 0.15;
+  }
+  .hero-banner-text h2 { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .hero-banner-text p { font-size: 13.5px; color: rgba(255,255,255,0.75); line-height: 1.6; }
+  .hero-avatar { width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; color: #fff; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.3); }
+  .hero-stats { display: flex; gap: 20px; margin-top: 14px; }
+  .hero-stat { text-align: left; }
+  .hero-stat-val { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: #fff; }
+  .hero-stat-label { font-size: 11px; color: rgba(255,255,255,0.65); }
+
+  .campaign-explore-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (max-width: 900px) { .campaign-explore-grid { grid-template-columns: 1fr; } }
+
+  .camp-card {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    overflow: hidden; transition: all 0.2s; cursor: pointer;
+  }
+  .camp-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  .camp-card-thumb {
+    height: 90px; display: flex; align-items: center; justify-content: center;
+    font-size: 40px; position: relative;
+  }
+  .camp-card-thumb.green { background: var(--green-50); }
+  .camp-card-thumb.teal { background: var(--teal-50); }
+  .camp-card-thumb.amber { background: var(--amber-50); }
+  .camp-card-thumb.coral { background: var(--coral-50); }
+  .camp-card-body { padding: 14px 16px; }
+  .camp-card-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+  .camp-card-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .camp-card-meta span { display: flex; align-items: center; gap: 4px; }
+  .camp-card-desc { font-size: 12.5px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 12px; }
+  .camp-card-footer { display: flex; align-items: center; justify-content: space-between; }
+  .spots-left { font-size: 12px; color: var(--coral-600); font-weight: 500; }
+  .spots-ok { font-size: 12px; color: var(--green-600); font-weight: 500; }
+
+  .joined-tag {
+    display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px;
+    background: var(--green-50); color: var(--green-800); border-radius: 99px;
+    font-size: 11.5px; font-weight: 500; border: 1px solid var(--green-200);
+  }
+
+  .timeline { display: flex; flex-direction: column; gap: 0; }
+  .timeline-item { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); position: relative; }
+  .timeline-item:last-child { border-bottom: none; }
+  .timeline-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+  .timeline-icon.green { background: var(--green-50); }
+  .timeline-icon.teal { background: var(--teal-50); }
+  .timeline-icon.amber { background: var(--amber-50); }
+  .timeline-content { flex: 1; }
+  .timeline-title { font-size: 13.5px; font-weight: 500; color: var(--text-primary); margin-bottom: 2px; }
+  .timeline-sub { font-size: 12px; color: var(--text-muted); }
+  .timeline-badge { font-size: 11px; padding: 2px 8px; border-radius: 99px; font-weight: 500; }
+
+  .achievement-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  @media (max-width: 900px) { .achievement-grid { grid-template-columns: repeat(2, 1fr); } }
+  .achievement-card {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 18px 14px; text-align: center; transition: all 0.2s;
+  }
+  .achievement-card:hover { box-shadow: var(--shadow-md); }
+  .achievement-card.earned { border-color: var(--amber-100); background: var(--amber-50); }
+  .achievement-card.locked { opacity: 0.5; filter: grayscale(0.6); }
+  .achievement-icon { font-size: 32px; margin-bottom: 8px; }
+  .achievement-name { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+  .achievement-desc { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+  .achievement-date { font-size: 10.5px; color: var(--amber-600); margin-top: 6px; font-weight: 500; }
+
+  .leaderboard-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .leaderboard-item:last-child { border-bottom: none; }
+  .leaderboard-rank { width: 28px; text-align: center; font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--text-muted); }
+  .leaderboard-rank.gold { color: #c9a227; }
+  .leaderboard-rank.silver { color: #888; }
+  .leaderboard-rank.bronze { color: #a0522d; }
+  .leaderboard-name { flex: 1; font-size: 13.5px; font-weight: 500; }
+  .leaderboard-hours { font-size: 13px; font-weight: 600; color: var(--green-600); }
+
+  .notif-list { display: flex; flex-direction: column; gap: 0; }
+  .notif-item { display: flex; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
+  .notif-item:last-child { border-bottom: none; }
+  .notif-item.unread { background: var(--green-50); margin: 0 -20px; padding: 14px 20px; }
+  .notif-item:hover { background: var(--bg); }
+  .notif-dot-indicator { width: 8px; height: 8px; border-radius: 50%; background: var(--green-400); margin-top: 6px; flex-shrink: 0; }
+  .notif-dot-indicator.read { background: transparent; }
+  .notif-text { font-size: 13px; color: var(--text-primary); line-height: 1.5; }
+  .notif-time { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+  .hours-log { display: flex; flex-direction: column; gap: 0; }
+  .hours-row { display: flex; align-items: center; gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--border); }
+  .hours-row:last-child { border-bottom: none; }
+  .hours-date { font-size: 12px; color: var(--text-muted); min-width: 90px; }
+  .hours-campaign { font-size: 13px; flex: 1; color: var(--text-primary); }
+  .hours-val { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--teal-600); min-width: 50px; text-align: right; }
+
+  .profile-section { display: grid; grid-template-columns: 1fr 1.4fr; gap: 20px; }
+  @media (max-width: 900px) { .profile-section { grid-template-columns: 1fr; } }
+  .profile-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; text-align: center; }
+  .profile-avatar-lg { width: 80px; height: 80px; border-radius: 50%; background: var(--green-400); display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; color: #fff; margin: 0 auto 14px; border: 3px solid var(--green-200); }
+  .profile-name-lg { font-family: var(--font-display); font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+  .profile-level { display: inline-flex; align-items: center; gap: 6px; background: var(--amber-50); color: var(--amber-800); padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: 600; margin-bottom: 16px; }
+  .profile-stats-row { display: flex; justify-content: center; gap: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .profile-stat { text-align: center; }
+  .profile-stat-val { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--text-primary); }
+  .profile-stat-label { font-size: 11px; color: var(--text-muted); }
+
+  .skill-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .skill-tag { padding: 4px 12px; background: var(--green-50); color: var(--green-800); border-radius: 99px; font-size: 12px; font-weight: 500; border: 1px solid var(--green-200); }
+
+  .community-post { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; margin-bottom: 14px; }
+  .community-post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .community-post-body { font-size: 13.5px; color: var(--text-primary); line-height: 1.6; margin-bottom: 12px; }
+  .community-post-footer { display: flex; align-items: center; gap: 14px; }
+  .post-action { display: flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--text-muted); cursor: pointer; transition: color 0.2s; }
+  .post-action:hover { color: var(--green-600); }
+  .post-img-placeholder { height: 120px; background: var(--green-50); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 12px; margin-bottom: 10px; border: 1px dashed var(--green-200); }
+
+  .register-modal-wrap { width: 520px; }
+  .camp-detail-header { background: var(--green-50); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; gap: 14px; align-items: center; }
+  .camp-detail-emoji { font-size: 36px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🌿</div>
+    <h1>EcoVol</h1>
+    <p>Quản lý tình nguyện viên</p>
+  </div>
+
+  <div class="sidebar-role" id="sidebarRole">
+    <div class="role-dot"></div>
+    <div>
+      <div class="role-label">Vai trò hiện tại</div>
+      <div class="role-name" id="roleNameDisplay">Quản trị viên</div>
+    </div>
+  </div>
+
+  <div class="sidebar-nav" id="adminNav">
+    <div class="nav-section-label">Tổng quan</div>
+    <a class="nav-item active" onclick="showPage('dashboard')">
+      <i class="fas fa-chart-pie"></i> Bảng điều khiển
+    </a>
+    <div class="nav-section-label">Quản lý</div>
+    <a class="nav-item" onclick="showPage('volunteers')">
+      <i class="fas fa-users"></i> Tình nguyện viên
+      <span class="nav-badge" id="pendingBadge">3</span>
+    </a>
+    <a class="nav-item" onclick="showPage('campaigns')">
+      <i class="fas fa-seedling"></i> Chiến dịch
+    </a>
+    <a class="nav-item" onclick="showPage('sponsors')">
+      <i class="fas fa-handshake"></i> Tổ chức tài trợ
+    </a>
+    <a class="nav-item" onclick="showPage('tasks')">
+      <i class="fas fa-tasks"></i> Phân công nhiệm vụ
+    </a>
+    <div class="nav-section-label">Báo cáo</div>
+    <a class="nav-item" onclick="showPage('reports')">
+      <i class="fas fa-file-alt"></i> Báo cáo & Thống kê
+    </a>
+    <a class="nav-item" onclick="showPage('settings')">
+      <i class="fas fa-cog"></i> Cài đặt hệ thống
+    </a>
+  </div>
+
+  <div class="sidebar-nav" id="sponsorNav" style="display:none">
+    <div class="nav-section-label">Tổ chức của tôi</div>
+    <a class="nav-item active" onclick="showSponsorPage('sp-overview')">
+      <i class="fas fa-home"></i> Tổng quan
+    </a>
+    <a class="nav-item" onclick="showSponsorPage('sp-projects')">
+      <i class="fas fa-project-diagram"></i> Dự án tài trợ
+    </a>
+    <a class="nav-item" onclick="showSponsorPage('sp-volunteers')">
+      <i class="fas fa-user-friends"></i> TNV tham gia
+    </a>
+    <a class="nav-item" onclick="showSponsorPage('sp-impact')">
+      <i class="fas fa-leaf"></i> Tác động môi trường
+    </a>
+    <a class="nav-item" onclick="showSponsorPage('sp-finance')">
+      <i class="fas fa-coins"></i> Tài chính & Ngân sách
+    </a>
+    <a class="nav-item" onclick="showSponsorPage('sp-reports')">
+      <i class="fas fa-chart-line"></i> Báo cáo
+    </a>
+  </div>
+
+  <div class="sidebar-nav" id="userNav" style="display:none">
+    <div class="nav-section-label">Của tôi</div>
+    <a class="nav-item active" onclick="showUserPage('u-home')">
+      <i class="fas fa-home"></i> Trang chủ
+    </a>
+    <a class="nav-item" onclick="showUserPage('u-campaigns')">
+      <i class="fas fa-seedling"></i> Khám phá chiến dịch
+    </a>
+    <a class="nav-item" onclick="showUserPage('u-myactivities')">
+      <i class="fas fa-calendar-check"></i> Hoạt động của tôi
+      <span class="nav-badge" id="userActivityBadge">2</span>
+    </a>
+    <a class="nav-item" onclick="showUserPage('u-hours')">
+      <i class="fas fa-clock"></i> Nhật ký giờ TN
+    </a>
+    <a class="nav-item" onclick="showUserPage('u-achievements')">
+      <i class="fas fa-medal"></i> Thành tích & Huy hiệu
+    </a>
+    <a class="nav-item" onclick="showUserPage('u-community')">
+      <i class="fas fa-comments"></i> Cộng đồng
+    </a>
+    <div class="nav-section-label">Tài khoản</div>
+    <a class="nav-item" onclick="showUserPage('u-profile')">
+      <i class="fas fa-user-circle"></i> Hồ sơ cá nhân
+    </a>
+    <a class="nav-item" onclick="showUserPage('u-notifications')">
+      <i class="fas fa-bell"></i> Thông báo
+      <span class="nav-badge" id="userNotifBadge" style="background:var(--amber-200);color:var(--amber-800)">5</span>
+    </a>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar" id="userAvatar">AD</div>
+      <div>
+        <div class="user-name" id="userName">Admin Hệ thống</div>
+        <div class="user-role" id="userRoleText">Quản trị viên</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbarTitle">🌿 Bảng Điều Khiển</div>
+    <div class="topbar-search">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="Tìm kiếm...">
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" title="Thông báo">
+        <i class="fas fa-bell"></i>
+        <span class="notif-dot"></span>
+      </button>
+      <button class="icon-btn" title="Tải xuống">
+        <i class="fas fa-download"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- ROLE SWITCHER -->
+    <div class="role-switcher">
+      <button class="role-btn active" onclick="switchRole('admin')">🛡️ Admin</button>
+      <button class="role-btn" onclick="switchRole('sponsor')">🏢 Tổ chức tài trợ</button>
+      <button class="role-btn" onclick="switchRole('user')">🙋 Tình nguyện viên</button>
+    </div>
+
+    <!-- ══════════════ ADMIN VIEWS ══════════════ -->
+
+    <!-- DASHBOARD -->
+    <div class="view active" id="view-dashboard">
+      <div class="section-header">
+        <div class="section-title">Tổng quan hệ thống</div>
+        <button class="btn btn-primary" onclick="showModal('addCampaignModal')">
+          <i class="fas fa-plus"></i> Tạo chiến dịch mới
+        </button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-label">Tình nguyện viên</div>
+          <div class="stat-value" id="statVols">247</div>
+          <div class="stat-sub">▲ 12 tháng này</div>
+          <div class="stat-icon green"><i class="fas fa-users"></i></div>
+        </div>
+        <div class="stat-card teal">
+          <div class="stat-label">Chiến dịch đang chạy</div>
+          <div class="stat-value" id="statCamp">8</div>
+          <div class="stat-sub">3 sắp kết thúc</div>
+          <div class="stat-icon teal"><i class="fas fa-seedling"></i></div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-label">Tổ chức tài trợ</div>
+          <div class="stat-value">14</div>
+          <div class="stat-sub">Tổng ngân sách: 2.4 tỷ</div>
+          <div class="stat-icon amber"><i class="fas fa-handshake"></i></div>
+        </div>
+        <div class="stat-card coral">
+          <div class="stat-label">Giờ tình nguyện</div>
+          <div class="stat-value">4,821</div>
+          <div class="stat-sub">▲ 18% so với tháng trước</div>
+          <div class="stat-icon coral"><i class="fas fa-clock"></i></div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Hoạt động gần đây</div>
+          </div>
+          <div class="card-body" style="padding:16px 20px">
+            <div class="activity-feed">
+              <div class="activity-item">
+                <div class="activity-dot green"></div>
+                <div>
+                  <div class="activity-text"><strong>Nguyễn Thị Mai</strong> vừa đăng ký tham gia chiến dịch <em>Trồng rừng Tây Nguyên</em></div>
+                  <div class="activity-time">2 phút trước</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot teal"></div>
+                <div>
+                  <div class="activity-text">Tổ chức <strong>GreenFund VN</strong> xác nhận tài trợ 150 triệu đồng</div>
+                  <div class="activity-time">1 giờ trước</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot amber"></div>
+                <div>
+                  <div class="activity-text">Chiến dịch <em>Dọn rác ven biển Đà Nẵng</em> hoàn thành — 89/90 TNV tham gia</div>
+                  <div class="activity-time">3 giờ trước</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot coral"></div>
+                <div>
+                  <div class="activity-text"><strong>Trần Minh Đức</strong> nộp đơn chờ phê duyệt</div>
+                  <div class="activity-time">Hôm nay, 09:15</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot green"></div>
+                <div>
+                  <div class="activity-text">Cập nhật báo cáo tháng 5 — 1,240 giờ tình nguyện ghi nhận</div>
+                  <div class="activity-time">Hôm qua, 17:00</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Chiến dịch nổi bật</div></div>
+            <div class="card-body" style="padding:16px">
+              <div style="margin-bottom:14px">
+                <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                  <span style="font-size:13px;font-weight:500">🌊 Làm sạch sông Sài Gòn</span>
+                  <span style="font-size:12px;color:var(--text-muted)">76%</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width:76%;background:var(--teal-400)"></div></div>
+              </div>
+              <div style="margin-bottom:14px">
+                <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                  <span style="font-size:13px;font-weight:500">🌳 Trồng rừng Tây Nguyên</span>
+                  <span style="font-size:12px;color:var(--text-muted)">52%</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width:52%"></div></div>
+              </div>
+              <div style="margin-bottom:14px">
+                <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                  <span style="font-size:13px;font-weight:500">♻️ Phân loại rác HCM</span>
+                  <span style="font-size:12px;color:var(--text-muted)">91%</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width:91%;background:var(--amber-200)"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                  <span style="font-size:13px;font-weight:500">🐢 Bảo vệ rùa biển</span>
+                  <span style="font-size:12px;color:var(--text-muted)">38%</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width:38%;background:var(--coral-400)"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title">Chờ phê duyệt</div><span class="badge pending">3 đơn</span></div>
+            <div class="card-body" style="padding:12px 16px;display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div class="avatar green">TM</div>
+                  <div>
+                    <div style="font-size:13px;font-weight:500">Trần Minh Đức</div>
+                    <div style="font-size:11px;color:var(--text-muted)">TNV mới • HCM</div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:6px">
+                  <button class="btn btn-sm" style="background:var(--green-50);color:var(--green-600);border-color:var(--green-200)" onclick="approveVolunteer(this,'Trần Minh Đức')"><i class="fas fa-check"></i></button>
+                  <button class="btn btn-sm btn-danger" onclick="rejectVolunteer(this)"><i class="fas fa-times"></i></button>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div class="avatar teal">LT</div>
+                  <div>
+                    <div style="font-size:13px;font-weight:500">Lê Thị Hoa</div>
+                    <div style="font-size:11px;color:var(--text-muted)">TNV mới • Đà Nẵng</div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:6px">
+                  <button class="btn btn-sm" style="background:var(--green-50);color:var(--green-600);border-color:var(--green-200)" onclick="approveVolunteer(this,'Lê Thị Hoa')"><i class="fas fa-check"></i></button>
+                  <button class="btn btn-sm btn-danger" onclick="rejectVolunteer(this)"><i class="fas fa-times"></i></button>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div class="avatar amber">PH</div>
+                  <div>
+                    <div style="font-size:13px;font-weight:500">Phạm Hoàng Nam</div>
+                    <div style="font-size:11px;color:var(--text-muted)">TNV mới • Hà Nội</div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:6px">
+                  <button class="btn btn-sm" style="background:var(--green-50);color:var(--green-600);border-color:var(--green-200)" onclick="approveVolunteer(this,'Phạm Hoàng Nam')"><i class="fas fa-check"></i></button>
+                  <button class="btn btn-sm btn-danger" onclick="rejectVolunteer(this)"><i class="fas fa-times"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VOLUNTEERS -->
+    <div class="view" id="view-volunteers">
+      <div class="section-header">
+        <div class="section-title">Tình nguyện viên</div>
+        <button class="btn btn-primary" onclick="showModal('addVolModal')">
+          <i class="fas fa-user-plus"></i> Thêm TNV mới
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="filter-bar">
+            <div class="search-wrap">
+              <i class="fas fa-search"></i>
+              <input type="text" class="search-input" placeholder="Tìm theo tên, email..." oninput="filterVolunteers(this.value)">
+            </div>
+            <select class="filter-select" onchange="filterVolByStatus(this.value)">
+              <option value="">Tất cả trạng thái</option>
+              <option value="active">Đang hoạt động</option>
+              <option value="pending">Chờ duyệt</option>
+              <option value="inactive">Tạm ngưng</option>
+            </select>
+            <select class="filter-select">
+              <option value="">Tất cả khu vực</option>
+              <option>TP. Hồ Chí Minh</option>
+              <option>Hà Nội</option>
+              <option>Đà Nẵng</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-body">
+          <table id="volTable">
+            <thead>
+              <tr>
+                <th>Tình nguyện viên</th>
+                <th>Email</th>
+                <th>Khu vực</th>
+                <th>Kỹ năng</th>
+                <th>Giờ TN</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="voltbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAMPAIGNS -->
+    <div class="view" id="view-campaigns">
+      <div class="section-header">
+        <div class="section-title">Chiến dịch môi trường</div>
+        <button class="btn btn-primary" onclick="showModal('addCampaignModal')">
+          <i class="fas fa-plus"></i> Tạo chiến dịch
+        </button>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="filter-bar">
+            <div class="search-wrap">
+              <i class="fas fa-search"></i>
+              <input type="text" class="search-input" placeholder="Tìm chiến dịch...">
+            </div>
+            <select class="filter-select">
+              <option>Tất cả loại</option>
+              <option>Trồng rừng</option>
+              <option>Làm sạch biển</option>
+              <option>Tái chế</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-body">
+          <table id="campTable">
+            <thead>
+              <tr>
+                <th>Tên chiến dịch</th>
+                <th>Loại</th>
+                <th>Địa điểm</th>
+                <th>Thời gian</th>
+                <th>TNV</th>
+                <th>Ngân sách</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="campTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SPONSORS ADMIN -->
+    <div class="view" id="view-sponsors">
+      <div class="section-header">
+        <div class="section-title">Tổ chức tài trợ</div>
+        <button class="btn btn-primary" onclick="showModal('addSponsorModal')">
+          <i class="fas fa-plus"></i> Thêm tổ chức
+        </button>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <table id="sponsorTable">
+            <thead>
+              <tr>
+                <th>Tổ chức</th>
+                <th>Loại hình</th>
+                <th>Liên hệ</th>
+                <th>Tổng tài trợ</th>
+                <th>Dự án đang tài trợ</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="sponsorTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TASKS -->
+    <div class="view" id="view-tasks">
+      <div class="section-header">
+        <div class="section-title">Phân công nhiệm vụ</div>
+        <button class="btn btn-primary" onclick="showModal('addTaskModal')">
+          <i class="fas fa-plus"></i> Tạo nhiệm vụ
+        </button>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <table>
+            <thead>
+              <tr>
+                <th>Nhiệm vụ</th>
+                <th>Chiến dịch</th>
+                <th>Giao cho</th>
+                <th>Hạn chót</th>
+                <th>Ưu tiên</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="taskTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="view" id="view-reports">
+      <div class="section-header">
+        <div class="section-title">Báo cáo & Thống kê</div>
+        <button class="btn btn-secondary"><i class="fas fa-download"></i> Xuất báo cáo</button>
+      </div>
+      <div class="stats-grid" style="margin-bottom:20px">
+        <div class="stat-card green"><div class="stat-label">Tổng giờ TN (2024)</div><div class="stat-value">24,180</div><div class="stat-sub">▲ 23% so với 2023</div><div class="stat-icon green"><i class="fas fa-clock"></i></div></div>
+        <div class="stat-card teal"><div class="stat-label">Cây đã trồng</div><div class="stat-value">18,400</div><div class="stat-sub">Mục tiêu: 20,000</div><div class="stat-icon teal"><i class="fas fa-tree"></i></div></div>
+        <div class="stat-card amber"><div class="stat-label">Rác thu gom (tấn)</div><div class="stat-value">342</div><div class="stat-sub">▲ 41% so với 2023</div><div class="stat-icon amber"><i class="fas fa-recycle"></i></div></div>
+        <div class="stat-card coral"><div class="stat-label">Tổng tài trợ nhận</div><div class="stat-value">2.4B</div><div class="stat-sub">14 tổ chức đóng góp</div><div class="stat-icon coral"><i class="fas fa-hand-holding-usd"></i></div></div>
+      </div>
+      <div class="report-grid">
+        <div class="report-card">
+          <h4>📊 Giờ tình nguyện theo tháng (2024)</h4>
+          <div class="report-row"><span class="label">Tháng 1</span><span class="value">1,240h</span></div>
+          <div class="report-row"><span class="label">Tháng 2</span><span class="value">890h</span></div>
+          <div class="report-row"><span class="label">Tháng 3</span><span class="value">1,560h</span></div>
+          <div class="report-row"><span class="label">Tháng 4</span><span class="value">2,100h</span></div>
+          <div class="report-row"><span class="label">Tháng 5</span><span class="value">2,380h</span></div>
+          <div class="report-row"><span class="label">Tháng 6</span><span class="value" style="color:var(--green-600)">4,821h ▲</span></div>
+        </div>
+        <div class="report-card">
+          <h4>🏆 TNV xuất sắc tháng 6</h4>
+          <div class="report-row"><span class="label">1. Nguyễn Thị Mai</span><span class="value">86 giờ</span></div>
+          <div class="report-row"><span class="label">2. Trần Văn Hùng</span><span class="value">74 giờ</span></div>
+          <div class="report-row"><span class="label">3. Lê Minh Phương</span><span class="value">68 giờ</span></div>
+          <div class="report-row"><span class="label">4. Phạm Thu Hà</span><span class="value">65 giờ</span></div>
+          <div class="report-row"><span class="label">5. Võ Quốc Bảo</span><span class="value">61 giờ</span></div>
+        </div>
+        <div class="report-card">
+          <h4>🌍 Tác động môi trường</h4>
+          <div class="report-row"><span class="label">CO₂ giảm thải (tấn)</span><span class="value">1,840</span></div>
+          <div class="report-row"><span class="label">Diện tích rừng phục hồi (ha)</span><span class="value">124</span></div>
+          <div class="report-row"><span class="label">Km bờ biển làm sạch</span><span class="value">68 km</span></div>
+          <div class="report-row"><span class="label">Hộ dân được tập huấn</span><span class="value">3,400</span></div>
+          <div class="report-row"><span class="label">Sông/hồ được cải thiện</span><span class="value">7</span></div>
+        </div>
+        <div class="report-card">
+          <h4>💰 Tài chính theo chiến dịch</h4>
+          <div class="report-row"><span class="label">Trồng rừng Tây Nguyên</span><span class="value">450 triệu</span></div>
+          <div class="report-row"><span class="label">Làm sạch sông Sài Gòn</span><span class="value">280 triệu</span></div>
+          <div class="report-row"><span class="label">Phân loại rác HCM</span><span class="value">190 triệu</span></div>
+          <div class="report-row"><span class="label">Bảo vệ rùa biển</span><span class="value">320 triệu</span></div>
+          <div class="report-row"><span class="label">Chi phí vận hành</span><span class="value" style="color:var(--coral-600)">-85 triệu</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="view" id="view-settings">
+      <div class="section-header"><div class="section-title">Cài đặt hệ thống</div></div>
+      <div class="report-grid">
+        <div class="report-card">
+          <h4>⚙️ Thông tin hệ thống</h4>
+          <div class="form-group"><label class="form-label">Tên tổ chức</label><input class="form-control" value="EcoVol Vietnam"></div>
+          <div class="form-group"><label class="form-label">Email liên hệ</label><input class="form-control" value="contact@ecovol.vn"></div>
+          <div class="form-group"><label class="form-label">Website</label><input class="form-control" value="https://ecovol.vn"></div>
+          <button class="btn btn-primary" onclick="showToast('Đã lưu cài đặt hệ thống!','success')">Lưu thay đổi</button>
+        </div>
+        <div class="report-card">
+          <h4>🔔 Cài đặt thông báo</h4>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">
+            <label style="display:flex;align-items:center;gap:10px;font-size:13.5px;cursor:pointer"><input type="checkbox" checked> Đơn đăng ký mới</label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:13.5px;cursor:pointer"><input type="checkbox" checked> Chiến dịch sắp kết thúc</label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:13.5px;cursor:pointer"><input type="checkbox"> Báo cáo hàng tuần qua email</label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:13.5px;cursor:pointer"><input type="checkbox" checked> Tổ chức tài trợ mới</label>
+          </div>
+          <button class="btn btn-primary" onclick="showToast('Cài đặt thông báo đã cập nhật!','success')">Lưu</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ SPONSOR VIEWS ══════════════ -->
+
+    <!-- SP OVERVIEW -->
+    <div class="view" id="view-sp-overview">
+      <div class="section-header">
+        <div class="section-title">Tổng quan — GreenFund Vietnam</div>
+        <span class="badge active"><i class="fas fa-circle" style="font-size:8px"></i> Đối tác chiến lược</span>
+      </div>
+      <div class="sponsor-grid">
+        <div class="sponsor-stat">
+          <div class="sponsor-stat-icon">💰</div>
+          <div class="sponsor-stat-value">2.4 tỷ</div>
+          <div class="sponsor-stat-label">Tổng tài trợ 2024</div>
+        </div>
+        <div class="sponsor-stat">
+          <div class="sponsor-stat-icon">🌿</div>
+          <div class="sponsor-stat-value">6</div>
+          <div class="sponsor-stat-label">Dự án đang tài trợ</div>
+        </div>
+        <div class="sponsor-stat">
+          <div class="sponsor-stat-icon">👥</div>
+          <div class="sponsor-stat-value">184</div>
+          <div class="sponsor-stat-label">TNV từ dự án của bạn</div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Dự án tài trợ gần đây</div></div>
+          <div class="card-body" style="padding:14px 16px;display:flex;flex-direction:column;gap:12px">
+            <div style="padding:12px;background:var(--green-50);border-radius:9px;border:1px solid var(--green-200)">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div><div style="font-size:13.5px;font-weight:600">🌳 Trồng rừng Tây Nguyên</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px">450 triệu VNĐ • 45 TNV</div></div>
+                <span class="badge active">Đang chạy</span>
+              </div>
+              <div class="progress-bar" style="margin-top:10px"><div class="progress-fill" style="width:52%"></div></div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:4px">52% mục tiêu — 10,400/20,000 cây</div>
+            </div>
+            <div style="padding:12px;background:var(--teal-50);border-radius:9px;border:1px solid var(--teal-100)">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div><div style="font-size:13.5px;font-weight:600">🌊 Làm sạch sông Sài Gòn</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px">280 triệu VNĐ • 62 TNV</div></div>
+                <span class="badge active">Đang chạy</span>
+              </div>
+              <div class="progress-bar" style="margin-top:10px"><div class="progress-fill" style="width:76%;background:var(--teal-400)"></div></div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:4px">76% hoàn thành</div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Tác động tháng 6</div></div>
+            <div class="card-body" style="padding:14px 16px">
+              <div class="report-row"><span class="label">🌱 Cây đã trồng</span><span class="value highlight-text">4,200</span></div>
+              <div class="report-row"><span class="label">🗑️ Rác thu gom</span><span class="value">84 tấn</span></div>
+              <div class="report-row"><span class="label">⏱️ Giờ tình nguyện</span><span class="value">1,840h</span></div>
+              <div class="report-row"><span class="label">🌍 CO₂ giảm thải</span><span class="value">420 tấn</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Thông tin tổ chức</div></div>
+            <div class="card-body" style="padding:14px 16px">
+              <div class="report-row"><span class="label">Loại hình</span><span class="value">Quỹ phi lợi nhuận</span></div>
+              <div class="report-row"><span class="label">Thành lập</span><span class="value">2018</span></div>
+              <div class="report-row"><span class="label">Đối tác từ</span><span class="value">01/2022</span></div>
+              <div class="report-row"><span class="label">Hạng đối tác</span><span class="value" style="color:var(--amber-600)">⭐ Vàng</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SP PROJECTS -->
+    <div class="view" id="view-sp-projects">
+      <div class="section-header">
+        <div class="section-title">Dự án tài trợ</div>
+        <button class="btn btn-primary" onclick="showModal('addProjectModal')"><i class="fas fa-plus"></i> Đề xuất dự án mới</button>
+      </div>
+      <div class="project-cards" id="projectCards"></div>
+    </div>
+
+    <!-- SP VOLUNTEERS -->
+    <div class="view" id="view-sp-volunteers">
+      <div class="section-header"><div class="section-title">TNV tham gia dự án của bạn</div></div>
+      <div class="card">
+        <div class="card-body">
+          <table>
+            <thead><tr><th>Tình nguyện viên</th><th>Dự án</th><th>Giờ TN</th><th>Đóng góp</th><th>Đánh giá</th></tr></thead>
+            <tbody>
+              <tr><td><div class="avatar-group"><div class="avatar green">NM</div><div><div style="font-size:13px;font-weight:500">Nguyễn Thị Mai</div><div style="font-size:11px;color:var(--text-muted)">TP. HCM</div></div></div></td><td>Trồng rừng Tây Nguyên</td><td>86h</td><td>Trồng cây, Hướng dẫn cộng đồng</td><td>⭐⭐⭐⭐⭐</td></tr>
+              <tr><td><div class="avatar-group"><div class="avatar teal">TV</div><div><div style="font-size:13px;font-weight:500">Trần Văn Hùng</div><div style="font-size:11px;color:var(--text-muted)">Hà Nội</div></div></div></td><td>Làm sạch sông Sài Gòn</td><td>74h</td><td>Lặn thu rác, Vận chuyển</td><td>⭐⭐⭐⭐⭐</td></tr>
+              <tr><td><div class="avatar-group"><div class="avatar amber">LP</div><div><div style="font-size:13px;font-weight:500">Lê Minh Phương</div><div style="font-size:11px;color:var(--text-muted)">Đà Nẵng</div></div></div></td><td>Trồng rừng Tây Nguyên</td><td>68h</td><td>Ươm giống, Chăm sóc cây non</td><td>⭐⭐⭐⭐</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SP IMPACT -->
+    <div class="view" id="view-sp-impact">
+      <div class="section-header"><div class="section-title">Tác động môi trường</div></div>
+      <div class="stats-grid">
+        <div class="stat-card green"><div class="stat-label">Cây trồng được</div><div class="stat-value">18,400</div><div class="stat-sub">Mục tiêu: 20,000</div><div class="stat-icon green"><i class="fas fa-tree"></i></div></div>
+        <div class="stat-card teal"><div class="stat-label">CO₂ giảm thải</div><div class="stat-value">1,840t</div><div class="stat-sub">Tương đương 800 xe ô tô</div><div class="stat-icon teal"><i class="fas fa-wind"></i></div></div>
+        <div class="stat-card amber"><div class="stat-label">Diện tích phục hồi</div><div class="stat-value">124ha</div><div class="stat-sub">Rừng và đất ngập nước</div><div class="stat-icon amber"><i class="fas fa-map"></i></div></div>
+        <div class="stat-card coral"><div class="stat-label">Hộ dân hưởng lợi</div><div class="stat-value">3,400</div><div class="stat-sub">Cải thiện sinh kế</div><div class="stat-icon coral"><i class="fas fa-home"></i></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Chi tiết tác động theo dự án</div></div>
+        <div class="card-body">
+          <table>
+            <thead><tr><th>Dự án</th><th>Cây trồng</th><th>Rác thu (tấn)</th><th>CO₂ giảm</th><th>Km làm sạch</th></tr></thead>
+            <tbody>
+              <tr><td>🌳 Trồng rừng Tây Nguyên</td><td>10,400</td><td>—</td><td>840 tấn</td><td>—</td></tr>
+              <tr><td>🌊 Làm sạch sông Sài Gòn</td><td>—</td><td>84</td><td>120 tấn</td><td>24 km</td></tr>
+              <tr><td>🐢 Bảo vệ rùa biển</td><td>800</td><td>32</td><td>280 tấn</td><td>44 km</td></tr>
+              <tr><td>♻️ Phân loại rác HCM</td><td>—</td><td>226</td><td>600 tấn</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SP FINANCE -->
+    <div class="view" id="view-sp-finance">
+      <div class="section-header"><div class="section-title">Tài chính & Ngân sách</div><button class="btn btn-secondary"><i class="fas fa-file-pdf"></i> Xuất báo cáo tài chính</button></div>
+      <div class="report-grid">
+        <div class="report-card">
+          <h4>💰 Tổng ngân sách đã tài trợ</h4>
+          <div class="report-row"><span class="label">Q1 2024</span><span class="value currency">480,000,000 ₫</span></div>
+          <div class="report-row"><span class="label">Q2 2024</span><span class="value currency">760,000,000 ₫</span></div>
+          <div class="report-row"><span class="label">Q3 2024 (dự kiến)</span><span class="value currency">620,000,000 ₫</span></div>
+          <div class="report-row"><span class="label">Q4 2024 (dự kiến)</span><span class="value currency">540,000,000 ₫</span></div>
+          <div class="report-row" style="background:var(--green-50);padding:8px;border-radius:6px;margin-top:8px"><span class="label" style="font-weight:600">Tổng năm 2024</span><span class="value" style="color:var(--green-800);font-size:15px">2,400,000,000 ₫</span></div>
+        </div>
+        <div class="report-card">
+          <h4>📑 Phân bổ ngân sách</h4>
+          <div class="report-row"><span class="label">Vật tư, thiết bị</span><span class="value">38%</span></div>
+          <div class="report-row"><span class="label">Nhân lực TNV</span><span class="value">22%</span></div>
+          <div class="report-row"><span class="label">Vận chuyển, logistics</span><span class="value">18%</span></div>
+          <div class="report-row"><span class="label">Truyền thông, giáo dục</span><span class="value">12%</span></div>
+          <div class="report-row"><span class="label">Quản lý dự án</span><span class="value">10%</span></div>
+        </div>
+      </div>
+      <div class="card mt-20">
+        <div class="card-header"><div class="card-title">Lịch sử giao dịch</div></div>
+        <div class="card-body">
+          <table>
+            <thead><tr><th>Ngày</th><th>Dự án</th><th>Loại</th><th>Số tiền</th><th>Trạng thái</th></tr></thead>
+            <tbody>
+              <tr><td>15/06/2024</td><td>Trồng rừng Tây Nguyên</td><td>Giải ngân đợt 2</td><td class="currency" style="color:var(--green-600)">+150,000,000 ₫</td><td><span class="badge completed">Hoàn thành</span></td></tr>
+              <tr><td>01/06/2024</td><td>Làm sạch sông Sài Gòn</td><td>Giải ngân đợt 1</td><td class="currency" style="color:var(--green-600)">+80,000,000 ₫</td><td><span class="badge completed">Hoàn thành</span></td></tr>
+              <tr><td>20/05/2024</td><td>Bảo vệ rùa biển</td><td>Cam kết tài trợ</td><td class="currency" style="color:var(--amber-600)">+320,000,000 ₫</td><td><span class="badge pending">Đang xử lý</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SP REPORTS -->
+    <div class="view" id="view-sp-reports">
+      <div class="section-header"><div class="section-title">Báo cáo tổng hợp</div><button class="btn btn-primary"><i class="fas fa-download"></i> Tải báo cáo PDF</button></div>
+      <div class="card">
+        <div class="card-body" style="padding:28px">
+          <div style="text-align:center;margin-bottom:24px">
+            <div style="font-size:14px;color:var(--text-muted)">Báo cáo tác động</div>
+            <div style="font-family:var(--font-display);font-size:22px;font-weight:700;margin:4px 0">GreenFund Vietnam × EcoVol</div>
+            <div style="font-size:13px;color:var(--text-muted)">Quý 2, 2024</div>
+          </div>
+          <div class="report-grid">
+            <div class="report-card"><h4>Tóm tắt thực hiện</h4>
+              <div class="report-row"><span class="label">Dự án triển khai</span><span class="value">6</span></div>
+              <div class="report-row"><span class="label">Hoàn thành đúng tiến độ</span><span class="value" style="color:var(--green-600)">5/6</span></div>
+              <div class="report-row"><span class="label">TNV tổng cộng</span><span class="value">184</span></div>
+              <div class="report-row"><span class="label">Tổng giờ tình nguyện</span><span class="value">3,680h</span></div>
+            </div>
+            <div class="report-card"><h4>Hiệu quả đầu tư</h4>
+              <div class="report-row"><span class="label">Chi phí/cây trồng</span><span class="value">43,000 ₫</span></div>
+              <div class="report-row"><span class="label">Chi phí/tấn rác</span><span class="value">1,240,000 ₫</span></div>
+              <div class="report-row"><span class="label">Giờ TN/triệu đồng</span><span class="value">15.3h</span></div>
+              <div class="report-row"><span class="label">Điểm hài lòng TNV</span><span class="value" style="color:var(--green-600)">4.7/5.0</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ══════════ MODALS ══════════ -->
+
+<!-- Add Volunteer Modal -->
+<div class="modal-overlay" id="addVolModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>➕ Thêm Tình nguyện viên</h3>
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('addVolModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Họ và tên *</label><input class="form-control" id="volName" placeholder="Nguyễn Văn A"></div>
+        <div class="form-group"><label class="form-label">Ngày sinh</label><input class="form-control" type="date" id="volDob"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Email *</label><input class="form-control" id="volEmail" placeholder="email@example.com"></div>
+        <div class="form-group"><label class="form-label">Số điện thoại</label><input class="form-control" id="volPhone" placeholder="0901234567"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Khu vực</label>
+          <select class="form-control" id="volCity">
+            <option>TP. Hồ Chí Minh</option><option>Hà Nội</option><option>Đà Nẵng</option><option>Cần Thơ</option><option>Khác</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Kỹ năng chính</label>
+          <select class="form-control" id="volSkill">
+            <option>Trồng cây</option><option>Dọn rác</option><option>Giáo dục cộng đồng</option><option>Vận chuyển</option><option>Truyền thông</option><option>Quản lý dự án</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Ghi chú</label><textarea class="form-control" id="volNote" placeholder="Thông tin thêm..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('addVolModal')">Hủy</button>
+      <button class="btn btn-primary" onclick="addVolunteer()"><i class="fas fa-save"></i> Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Volunteer Modal -->
+<div class="modal-overlay" id="editVolModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>✏️ Chỉnh sửa Tình nguyện viên</h3>
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('editVolModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Họ và tên *</label><input class="form-control" id="editVolName"></div>
+        <div class="form-group"><label class="form-label">Email *</label><input class="form-control" id="editVolEmail"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Khu vực</label><input class="form-control" id="editVolCity"></div>
+        <div class="form-group"><label class="form-label">Kỹ năng</label><input class="form-control" id="editVolSkill"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Trạng thái</label>
+        <select class="form-control" id="editVolStatus">
+          <option value="active">Đang hoạt động</option>
+          <option value="pending">Chờ duyệt</option>
+          <option value="inactive">Tạm ngưng</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('editVolModal')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveEditVol()"><i class="fas fa-save"></i> Lưu thay đổi</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Campaign Modal -->
+<div class="modal-overlay" id="addCampaignModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>🌿 Tạo Chiến dịch mới</h3>
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('addCampaignModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Tên chiến dịch *</label><input class="form-control" id="campName" placeholder="VD: Trồng 10,000 cây xanh"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Loại chiến dịch</label>
+          <select class="form-control" id="campType">
+            <option>🌳 Trồng rừng</option><option>🌊 Làm sạch biển/sông</option><option>♻️ Tái chế</option><option>🐢 Bảo tồn động vật</option><option>🌱 Giáo dục môi trường</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Địa điểm</label><input class="form-control" id="campLoc" placeholder="VD: Lâm Đồng"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Ngày bắt đầu</label><input class="form-control" type="date" id="campStart"></div>
+        <div class="form-group"><label class="form-label">Ngày kết thúc</label><input class="form-control" type="date" id="campEnd"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Số TNV tối đa</label><input class="form-control" type="number" id="campMaxVol" placeholder="100"></div>
+        <div class="form-group"><label class="form-label">Ngân sách (VNĐ)</label><input class="form-control" id="campBudget" placeholder="VD: 200,000,000"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Mô tả chiến dịch</label><textarea class="form-control" id="campDesc" placeholder="Mục tiêu, hoạt động cụ thể..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('addCampaignModal')">Hủy</button>
+      <button class="btn btn-primary" onclick="addCampaign()"><i class="fas fa-seedling"></i> Tạo chiến dịch</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Campaign Modal -->
+<div class="modal-overlay" id="editCampModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>✏️ Chỉnh sửa Chiến dịch</h3>
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('editCampModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Tên chiến dịch *</label><input class="form-control" id="editCampName"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Địa điểm</label><input class="form-control" id="editCampLoc"></div>
+        <div class="form-group"><label class="form-label">Trạng thái</label>
+          <select class="form-control" id="editCampStatus">
+            <option value="active">Đang chạy</option><option value="completed">Hoàn thành</option><option value="pending">Chờ triển khai</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Ngân sách</label><input class="form-control" id="editCampBudget"></div>
+        <div class="form-group"><label class="form-label">Số TNV tối đa</label><input class="form-control" type="number" id="editCampMaxVol"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('editCampModal')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveEditCamp()"><i class="fas fa-save"></i> Lưu thay đổi</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Sponsor Modal -->
+<div class="modal-overlay" id="addSponsorModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>🏢 Thêm Tổ chức tài trợ</h3>
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('addSponsorModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Tên tổ chức *</label><input class="form-control" id="spName" placeholder="VD: EcoGreen Foundation"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Loại hình</label>
+          <select class="form-control" id="spType"><option>Quỹ phi lợi nhuận</option><option>Doanh nghiệp</option><option>Tổ chức chính phủ</option><option>Tổ chức quốc tế</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Người liên hệ</label><input class="form-control" id="spContact" placeholder="Họ tên"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Email</label><input class="form-control" id="spEmail" placeholder="contact@org.vn"></div>
+        <div class="form-group"><label class="form-label">Số tiền tài trợ (VNĐ)</label><input class="form-control" id="spAmount" placeholder="VD: 500,000,000"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Website</label><input class="form-control" id="spWeb" placeholder="https://..."></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('addSponsorModal')">Hủy</button>
+      <button class="btn btn-primary" onclick="addSponsor()"><i class="fas fa-save"></i> Thêm tổ chức</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Task Modal -->
+<div class="modal-overlay" id="addTaskModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>📋 Tạo Nhiệm vụ mới</h3>
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('addTaskModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Tên nhiệm vụ *</label><input class="form-control" id="taskName" placeholder="VD: Thu gom rác khu vực A"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Chiến dịch</label>
+          <select class="form-control" id="taskCamp"><option>🌳 Trồng rừng Tây Nguyên</option><option>🌊 Làm sạch sông Sài Gòn</option><option>♻️ Phân loại rác HCM</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Giao cho</label><input class="form-control" id="taskAssign" placeholder="Tên TNV..."></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Hạn chót</label><input class="form-control" type="date" id="taskDue"></div>
+        <div class="form-group"><label class="form-label">Ưu tiên</label>
+          <select class="form-control" id="taskPriority"><option>🔴 Cao</option><option>🟡 Trung bình</option><option>🟢 Thấp</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Mô tả</label><textarea class="form-control" id="taskDesc"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('addTaskModal')">Hủy</button>
+      <button class="btn btn-primary" onclick="addTask()"><i class="fas fa-save"></i> Tạo nhiệm vụ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Project Modal (Sponsor) -->
+<div class="modal-overlay" id="addProjectModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>🌿 Đề xuất Dự án mới</h3>
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('addProjectModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Tên dự án *</label><input class="form-control" id="projName" placeholder="VD: Phục hồi rừng ngập mặn"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Loại dự án</label>
+          <select class="form-control" id="projType"><option>🌳 Trồng rừng</option><option>🌊 Làm sạch nguồn nước</option><option>♻️ Tái chế</option><option>🌱 Giáo dục</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Ngân sách đề xuất (VNĐ)</label><input class="form-control" id="projBudget" placeholder="VD: 300,000,000"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Địa điểm</label><input class="form-control" id="projLoc" placeholder="Tỉnh/thành phố"></div>
+        <div class="form-group"><label class="form-label">Thời gian thực hiện</label>
+          <select class="form-control" id="projDuration"><option>3 tháng</option><option>6 tháng</option><option>12 tháng</option><option>24 tháng</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Mục tiêu & kỳ vọng</label><textarea class="form-control" id="projGoal" placeholder="Mô tả tác động mong muốn..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('addProjectModal')">Hủy</button>
+      <button class="btn btn-primary" onclick="addProject()"><i class="fas fa-paper-plane"></i> Gửi đề xuất</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal confirm-modal">
+    <div class="modal-body" style="padding:28px;text-align:center">
+      <div class="confirm-icon"><i class="fas fa-trash"></i></div>
+      <h3 style="margin-bottom:8px">Xác nhận xóa</h3>
+      <p style="font-size:13.5px;color:var(--text-secondary);margin-bottom:0" id="deleteMsg">Bạn có chắc muốn xóa mục này?</p>
+    </div>
+    <div class="modal-footer" style="justify-content:center;gap:12px">
+      <button class="btn btn-secondary" onclick="closeModal('deleteModal')">Hủy bỏ</button>
+      <button class="btn btn-danger" onclick="confirmDelete()"><i class="fas fa-trash"></i> Xóa</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ══════════════════════════════
+// DATA
+// ══════════════════════════════
+let volunteers = [
+  { id:1, name:'Nguyễn Thị Mai', email:'mai.nguyen@gmail.com', city:'TP. Hồ Chí Minh', skill:'Trồng cây', hours:86, status:'active' },
+  { id:2, name:'Trần Văn Hùng', email:'hung.tran@gmail.com', city:'Hà Nội', skill:'Dọn rác', hours:74, status:'active' },
+  { id:3, name:'Lê Minh Phương', email:'phuong.le@gmail.com', city:'Đà Nẵng', skill:'Giáo dục cộng đồng', hours:68, status:'active' },
+  { id:4, name:'Phạm Thu Hà', email:'ha.pham@gmail.com', city:'TP. Hồ Chí Minh', skill:'Truyền thông', hours:65, status:'active' },
+  { id:5, name:'Võ Quốc Bảo', email:'bao.vo@gmail.com', city:'Cần Thơ', skill:'Vận chuyển', hours:61, status:'active' },
+  { id:6, name:'Trần Minh Đức', email:'duc.tran@gmail.com', city:'TP. Hồ Chí Minh', skill:'Trồng cây', hours:0, status:'pending' },
+  { id:7, name:'Lê Thị Hoa', email:'hoa.le@gmail.com', city:'Đà Nẵng', skill:'Dọn rác', hours:0, status:'pending' },
+  { id:8, name:'Phạm Hoàng Nam', email:'nam.pham@gmail.com', city:'Hà Nội', skill:'Trồng cây', hours:0, status:'pending' },
+  { id:9, name:'Nguyễn Văn Tuấn', email:'tuan.ng@gmail.com', city:'Hà Nội', skill:'Quản lý dự án', hours:48, status:'inactive' },
+];
+
+let campaigns = [
+  { id:1, name:'🌳 Trồng rừng Tây Nguyên', type:'Trồng rừng', loc:'Lâm Đồng', time:'01/04–30/09/2024', vols:'45/100', budget:'450 triệu', status:'active' },
+  { id:2, name:'🌊 Làm sạch sông Sài Gòn', type:'Làm sạch nước', loc:'TP. HCM', time:'01/05–31/07/2024', vols:'62/80', budget:'280 triệu', status:'active' },
+  { id:3, name:'♻️ Phân loại rác HCM', type:'Tái chế', loc:'TP. HCM', time:'01/03–30/06/2024', vols:'89/90', budget:'190 triệu', status:'active' },
+  { id:4, name:'🐢 Bảo vệ rùa biển', type:'Bảo tồn', loc:'Bình Thuận', time:'01/06–31/12/2024', vols:'28/60', budget:'320 triệu', status:'active' },
+  { id:5, name:'🌴 Dọn rác ven biển Đà Nẵng', type:'Làm sạch biển', loc:'Đà Nẵng', time:'15/03–15/05/2024', vols:'90/90', budget:'120 triệu', status:'completed' },
+];
+
+let sponsors = [
+  { id:1, name:'GreenFund Vietnam', type:'Quỹ phi lợi nhuận', contact:'Nguyễn Hoàng', amount:'2,400,000,000', projects:6, status:'active' },
+  { id:2, name:'EcoTech Corp', type:'Doanh nghiệp', contact:'Trần Thu Hương', amount:'450,000,000', projects:2, status:'active' },
+  { id:3, name:'WWF Vietnam', type:'Tổ chức quốc tế', contact:'Michael Lee', amount:'680,000,000', projects:3, status:'active' },
+  { id:4, name:'Bộ TNMT', type:'Chính phủ', contact:'Lê Văn Đức', amount:'320,000,000', projects:1, status:'active' },
+  { id:5, name:'VinGroup Foundation', type:'Doanh nghiệp', contact:'Phạm Minh', amount:'1,200,000,000', projects:4, status:'pending' },
+];
+
+let tasks = [
+  { id:1, name:'Thu gom rác khu vực A', camp:'🌊 Làm sạch sông Sài Gòn', assign:'Nguyễn Thị Mai', due:'20/06/2024', priority:'🔴 Cao', status:'active' },
+  { id:2, name:'Ươm 500 cây giống', camp:'🌳 Trồng rừng Tây Nguyên', assign:'Trần Văn Hùng', due:'01/07/2024', priority:'🟡 Trung bình', status:'active' },
+  { id:3, name:'Tổ chức buổi tập huấn', camp:'♻️ Phân loại rác HCM', assign:'Lê Minh Phương', due:'25/06/2024', priority:'🟡 Trung bình', status:'completed' },
+  { id:4, name:'Giám sát tổ rùa #12', camp:'🐢 Bảo vệ rùa biển', assign:'Phạm Thu Hà', due:'30/06/2024', priority:'🔴 Cao', status:'active' },
+];
+
+let projects = [
+  { id:1, name:'🌳 Trồng rừng Tây Nguyên', type:'Trồng rừng', loc:'Lâm Đồng', budget:'450 triệu', vols:45, progress:52, desc:'Phục hồi 50ha rừng tự nhiên tại khu vực đầu nguồn sông Đồng Nai, trồng 20,000 cây bản địa.', status:'active' },
+  { id:2, name:'🌊 Làm sạch sông Sài Gòn', type:'Làm sạch nước', loc:'TP. HCM', budget:'280 triệu', vols:62, progress:76, desc:'Làm sạch 24km đường sông, thu gom và xử lý rác thải nhựa, cải thiện chất lượng nước.', status:'active' },
+  { id:3, name:'🐢 Bảo vệ rùa biển', type:'Bảo tồn', loc:'Bình Thuận', budget:'320 triệu', vols:28, progress:38, desc:'Tuần tra và bảo vệ tổ rùa biển quý hiếm trong mùa sinh sản, nghiên cứu và gắn chip theo dõi.', status:'active' },
+  { id:4, name:'♻️ Phân loại rác HCM', type:'Tái chế', loc:'TP. HCM', budget:'190 triệu', vols:89, progress:91, desc:'Triển khai chương trình phân loại rác tại nguồn cho 3,400 hộ dân tại quận 7 và quận 4.', status:'active' },
+];
+
+let editIndex = null, deleteTarget = null, deleteType = null;
+
+// ══════════════════════════════
+// NAVIGATION
+// ══════════════════════════════
+let currentRole = 'admin';
+
+function switchRole(role) {
+  currentRole = role;
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  if (role === 'admin') {
+    document.getElementById('adminNav').style.display = '';
+    document.getElementById('sponsorNav').style.display = 'none';
+    document.getElementById('roleNameDisplay').textContent = 'Quản trị viên';
+    document.getElementById('userName').textContent = 'Admin Hệ thống';
+    document.getElementById('userRoleText').textContent = 'Quản trị viên';
+    document.getElementById('userAvatar').textContent = 'AD';
+    showPage('dashboard');
+  } else {
+    document.getElementById('adminNav').style.display = 'none';
+    document.getElementById('sponsorNav').style.display = '';
+    document.getElementById('roleNameDisplay').textContent = 'Tổ chức tài trợ';
+    document.getElementById('userName').textContent = 'GreenFund Vietnam';
+    document.getElementById('userRoleText').textContent = 'Đối tác chiến lược';
+    document.getElementById('userAvatar').textContent = 'GF';
+    showSponsorPage('sp-overview');
+  }
+}
+
+function showPage(page) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('#adminNav .nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + page).classList.add('active');
+  const nav = document.querySelector(`#adminNav .nav-item[onclick*="${page}"]`);
+  if (nav) nav.classList.add('active');
+  const titles = { dashboard:'🌿 Bảng Điều Khiển', volunteers:'👥 Tình Nguyện Viên', campaigns:'🌱 Chiến Dịch', sponsors:'🤝 Tổ Chức Tài Trợ', tasks:'📋 Phân Công Nhiệm Vụ', reports:'📊 Báo Cáo & Thống Kê', settings:'⚙️ Cài Đặt' };
+  document.getElementById('topbarTitle').textContent = titles[page] || '🌿 EcoVol';
+  if (page === 'volunteers') renderVolunteers(volunteers);
+  if (page === 'campaigns') renderCampaigns(campaigns);
+  if (page === 'sponsors') renderSponsors(sponsors);
+  if (page === 'tasks') renderTasks(tasks);
+}
+
+function showSponsorPage(page) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('#sponsorNav .nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + page).classList.add('active');
+  const nav = document.querySelector(`#sponsorNav .nav-item[onclick*="${page}"]`);
+  if (nav) nav.classList.add('active');
+  const titles = { 'sp-overview':'🏢 GreenFund Vietnam', 'sp-projects':'🌿 Dự Án Tài Trợ', 'sp-volunteers':'👥 TNV Tham Gia', 'sp-impact':'🌍 Tác Động Môi Trường', 'sp-finance':'💰 Tài Chính & Ngân Sách', 'sp-reports':'📊 Báo Cáo' };
+  document.getElementById('topbarTitle').textContent = titles[page] || '🏢 GreenFund';
+  if (page === 'sp-projects') renderProjects();
+}
+
+// ══════════════════════════════
+// RENDER FUNCTIONS
+// ══════════════════════════════
+const avatarColors = ['green','teal','amber','coral','blue'];
+
+function renderVolunteers(data) {
+  const tb = document.getElementById('voltbody');
+  if (!data.length) { tb.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-users"></i><p>Không tìm thấy tình nguyện viên</p></div></td></tr>'; return; }
+  tb.innerHTML = data.map((v, i) => {
+    const c = avatarColors[i % avatarColors.length];
+    const initials = v.name.split(' ').slice(-2).map(n=>n[0]).join('').toUpperCase();
+    const statusMap = { active:'<span class="badge active">● Hoạt động</span>', pending:'<span class="badge pending">⧗ Chờ duyệt</span>', inactive:'<span class="badge inactive">○ Tạm ngưng</span>' };
+    return `<tr>
+      <td><div class="avatar-group"><div class="avatar ${c}">${initials}</div><div><div style="font-size:13.5px;font-weight:500">${v.name}</div><div style="font-size:11px;color:var(--text-muted)">#TNV-${String(v.id).padStart(3,'0')}</div></div></div></td>
+      <td style="color:var(--text-secondary)">${v.email}</td>
+      <td>${v.city}</td>
+      <td><span style="font-size:12px;background:var(--green-50);color:var(--green-800);padding:3px 9px;border-radius:99px">${v.skill}</span></td>
+      <td style="font-weight:600;color:var(--teal-600)">${v.hours}h</td>
+      <td>${statusMap[v.status]}</td>
+      <td><div class="action-btns">
+        <button class="btn btn-sm btn-secondary" title="Xem chi tiết" onclick="viewVol(${v.id})"><i class="fas fa-eye"></i></button>
+        <button class="btn btn-sm btn-secondary" title="Chỉnh sửa" onclick="editVol(${v.id})"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-sm btn-danger" title="Xóa" onclick="deleteItem('vol',${v.id},'Bạn có chắc muốn xóa <strong>${v.name}</strong>?')"><i class="fas fa-trash"></i></button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderCampaigns(data) {
+  const tb = document.getElementById('campTbody');
+  const statusMap = { active:'<span class="badge active">● Đang chạy</span>', completed:'<span class="badge completed">✓ Hoàn thành</span>', pending:'<span class="badge pending">⧗ Chờ triển khai</span>' };
+  tb.innerHTML = data.map((c, i) => `<tr>
+    <td><span style="font-weight:500">${c.name}</span></td>
+    <td style="font-size:12px;color:var(--text-secondary)">${c.type}</td>
+    <td>${c.loc}</td>
+    <td style="font-size:12px;color:var(--text-muted)">${c.time}</td>
+    <td style="font-weight:600">${c.vols}</td>
+    <td style="color:var(--green-600);font-weight:500">${c.budget}</td>
+    <td>${statusMap[c.status]}</td>
+    <td><div class="action-btns">
+      <button class="btn btn-sm btn-secondary" onclick="editCamp(${c.id})"><i class="fas fa-edit"></i></button>
+      <button class="btn btn-sm btn-danger" onclick="deleteItem('camp',${c.id},'Xóa chiến dịch <strong>${c.name}</strong>?')"><i class="fas fa-trash"></i></button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function renderSponsors(data) {
+  const tb = document.getElementById('sponsorTbody');
+  const statusMap = { active:'<span class="badge active">● Hoạt động</span>', pending:'<span class="badge pending">⧗ Chờ duyệt</span>', inactive:'<span class="badge inactive">○ Tạm ngưng</span>' };
+  tb.innerHTML = data.map((s, i) => {
+    const c = avatarColors[i % avatarColors.length];
+    return `<tr>
+      <td><div class="avatar-group"><div class="avatar ${c}" style="border-radius:8px">${s.name.slice(0,2).toUpperCase()}</div><span style="font-size:13.5px;font-weight:500">${s.name}</span></div></td>
+      <td style="font-size:12px;color:var(--text-secondary)">${s.type}</td>
+      <td>${s.contact}</td>
+      <td style="font-weight:600;color:var(--green-600)" class="currency">${s.amount} ₫</td>
+      <td style="text-align:center;font-weight:600">${s.projects}</td>
+      <td>${statusMap[s.status]}</td>
+      <td><div class="action-btns">
+        <button class="btn btn-sm btn-secondary" onclick="viewSponsor(${s.id})"><i class="fas fa-eye"></i></button>
+        <button class="btn btn-sm btn-secondary" onclick="editSponsor(${s.id})"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-sm btn-danger" onclick="deleteItem('sponsor',${s.id},'Xóa tổ chức <strong>${s.name}</strong>?')"><i class="fas fa-trash"></i></button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderTasks(data) {
+  const tb = document.getElementById('taskTbody');
+  const statusMap = { active:'<span class="badge active">● Đang thực hiện</span>', completed:'<span class="badge completed">✓ Hoàn thành</span>' };
+  tb.innerHTML = data.map(t => `<tr>
+    <td style="font-weight:500">${t.name}</td>
+    <td style="font-size:12px">${t.camp}</td>
+    <td>${t.assign}</td>
+    <td style="font-size:12px;color:var(--text-muted)">${t.due}</td>
+    <td>${t.priority}</td>
+    <td>${statusMap[t.status]}</td>
+    <td><div class="action-btns">
+      <button class="btn btn-sm btn-secondary" onclick="completeTask(${t.id})"><i class="fas fa-check"></i></button>
+      <button class="btn btn-sm btn-danger" onclick="deleteItem('task',${t.id},'Xóa nhiệm vụ <strong>${t.name}</strong>?')"><i class="fas fa-trash"></i></button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function renderProjects() {
+  const container = document.getElementById('projectCards');
+  container.innerHTML = projects.map(p => {
+    const statusMap = { active:'<span class="badge active">● Đang chạy</span>', completed:'<span class="badge completed">✓ Hoàn thành</span>' };
+    return `<div class="project-card">
+      <div class="project-card-header">
+        <div><div class="project-card-title">${p.name}</div><div class="project-card-meta">📍 ${p.loc} • 💰 ${p.budget}</div></div>
+        ${statusMap[p.status]}
+      </div>
+      <div class="project-card-body">${p.desc}</div>
+      <div class="progress-bar" style="margin-bottom:6px"><div class="progress-fill" style="width:${p.progress}%"></div></div>
+      <div class="project-card-footer">
+        <div class="mini-stats">
+          <div class="mini-stat"><span>${p.progress}%</span> hoàn thành</div>
+          <div class="mini-stat"><span>${p.vols}</span> TNV</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm btn-secondary" onclick="showToast('Đang xem chi tiết dự án...','success')"><i class="fas fa-chart-bar"></i></button>
+          <button class="btn btn-sm btn-danger" onclick="deleteItem('proj',${p.id},'Xóa dự án <strong>${p.name}</strong>?')"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════
+// CRUD - VOLUNTEERS
+// ══════════════════════════════
+function addVolunteer() {
+  const name = document.getElementById('volName').value.trim();
+  const email = document.getElementById('volEmail').value.trim();
+  if (!name || !email) { showToast('Vui lòng nhập đầy đủ họ tên và email!', 'error'); return; }
+  const newVol = {
+    id: Date.now(), name, email,
+    city: document.getElementById('volCity').value,
+    skill: document.getElementById('volSkill').value,
+    hours: 0, status: 'pending'
+  };
+  volunteers.unshift(newVol);
+  updateStats();
+  renderVolunteers(volunteers);
+  closeModal('addVolModal');
+  document.getElementById('volName').value = '';
+  document.getElementById('volEmail').value = '';
+  showToast(`Đã thêm tình nguyện viên ${name} — chờ phê duyệt`, 'success');
+}
+
+function editVol(id) {
+  const v = volunteers.find(x => x.id === id);
+  if (!v) return;
+  editIndex = id;
+  document.getElementById('editVolName').value = v.name;
+  document.getElementById('editVolEmail').value = v.email;
+  document.getElementById('editVolCity').value = v.city;
+  document.getElementById('editVolSkill').value = v.skill;
+  document.getElementById('editVolStatus').value = v.status;
+  showModal('editVolModal');
+}
+
+function saveEditVol() {
+  const v = volunteers.find(x => x.id === editIndex);
+  if (!v) return;
+  v.name = document.getElementById('editVolName').value;
+  v.email = document.getElementById('editVolEmail').value;
+  v.city = document.getElementById('editVolCity').value;
+  v.skill = document.getElementById('editVolSkill').value;
+  v.status = document.getElementById('editVolStatus').value;
+  renderVolunteers(volunteers);
+  closeModal('editVolModal');
+  showToast('Đã cập nhật thông tin tình nguyện viên!', 'success');
+}
+
+function viewVol(id) {
+  const v = volunteers.find(x => x.id === id);
+  if (!v) return;
+  showToast(`Xem hồ sơ: ${v.name} — ${v.hours}h tình nguyện | ${v.city}`, 'success');
+}
+
+function approveVolunteer(btn, name) {
+  const row = btn.closest('div[style*="justify-content"]');
+  if (row) { row.style.opacity = '0.4'; row.style.pointerEvents = 'none'; }
+  const vPending = volunteers.find(x => x.name.includes(name.split(' ')[0]) && x.status === 'pending');
+  if (vPending) vPending.status = 'active';
+  updatePendingBadge();
+  showToast(`✅ Đã phê duyệt ${name}`, 'success');
+  updateStats();
+}
+
+function rejectVolunteer(btn) {
+  const row = btn.closest('div[style*="justify-content"]');
+  if (row) { row.style.opacity = '0.3'; row.style.pointerEvents = 'none'; }
+  updatePendingBadge();
+  showToast('Đã từ chối đơn đăng ký', 'error');
+}
+
+function updatePendingBadge() {
+  const pending = volunteers.filter(v => v.status === 'pending').length;
+  const badge = document.getElementById('pendingBadge');
+  if (badge) badge.textContent = pending;
+}
+
+// ══════════════════════════════
+// CRUD - CAMPAIGNS
+// ══════════════════════════════
+function addCampaign() {
+  const name = document.getElementById('campName').value.trim();
+  if (!name) { showToast('Vui lòng nhập tên chiến dịch!', 'error'); return; }
+  campaigns.unshift({
+    id: Date.now(), name,
+    type: document.getElementById('campType').value,
+    loc: document.getElementById('campLoc').value || 'Chưa xác định',
+    time: `${document.getElementById('campStart').value||'?'}–${document.getElementById('campEnd').value||'?'}`,
+    vols: `0/${document.getElementById('campMaxVol').value||'?'}`,
+    budget: document.getElementById('campBudget').value || '0',
+    status: 'active'
+  });
+  renderCampaigns(campaigns);
+  closeModal('addCampaignModal');
+  document.getElementById('campName').value = '';
+  showToast(`Chiến dịch "${name}" đã được tạo!`, 'success');
+  updateStats();
+}
+
+function editCamp(id) {
+  const c = campaigns.find(x => x.id === id);
+  if (!c) return;
+  editIndex = id;
+  document.getElementById('editCampName').value = c.name;
+  document.getElementById('editCampLoc').value = c.loc;
+  document.getElementById('editCampStatus').value = c.status;
+  document.getElementById('editCampBudget').value = c.budget;
+  document.getElementById('editCampMaxVol').value = '';
+  showModal('editCampModal');
+}
+
+function saveEditCamp() {
+  const c = campaigns.find(x => x.id === editIndex);
+  if (!c) return;
+  c.name = document.getElementById('editCampName').value;
+  c.loc = document.getElementById('editCampLoc').value;
+  c.status = document.getElementById('editCampStatus').value;
+  c.budget = document.getElementById('editCampBudget').value;
+  renderCampaigns(campaigns);
+  closeModal('editCampModal');
+  showToast('Đã cập nhật chiến dịch!', 'success');
+}
+
+// ══════════════════════════════
+// CRUD - SPONSORS
+// ══════════════════════════════
+function addSponsor() {
+  const name = document.getElementById('spName').value.trim();
+  if (!name) { showToast('Vui lòng nhập tên tổ chức!', 'error'); return; }
+  sponsors.unshift({
+    id: Date.now(), name,
+    type: document.getElementById('spType').value,
+    contact: document.getElementById('spContact').value || '—',
+    amount: document.getElementById('spAmount').value || '0',
+    projects: 0, status: 'pending'
+  });
+  renderSponsors(sponsors);
+  closeModal('addSponsorModal');
+  document.getElementById('spName').value = '';
+  showToast(`Tổ chức "${name}" đã được thêm — chờ duyệt`, 'success');
+}
+
+function editSponsor(id) {
+  showToast('Mở form chỉnh sửa tổ chức tài trợ...', 'success');
+}
+
+function viewSponsor(id) {
+  const s = sponsors.find(x => x.id === id);
+  if (!s) return;
+  showToast(`Xem hồ sơ: ${s.name} — ${s.projects} dự án đang tài trợ`, 'success');
+}
+
+// ══════════════════════════════
+// CRUD - TASKS
+// ══════════════════════════════
+function addTask() {
+  const name = document.getElementById('taskName').value.trim();
+  if (!name) { showToast('Vui lòng nhập tên nhiệm vụ!', 'error'); return; }
+  tasks.unshift({
+    id: Date.now(), name,
+    camp: document.getElementById('taskCamp').value,
+    assign: document.getElementById('taskAssign').value || 'Chưa phân công',
+    due: document.getElementById('taskDue').value || '—',
+    priority: document.getElementById('taskPriority').value,
+    status: 'active'
+  });
+  renderTasks(tasks);
+  closeModal('addTaskModal');
+  document.getElementById('taskName').value = '';
+  showToast(`Nhiệm vụ "${name}" đã được tạo!`, 'success');
+}
+
+function completeTask(id) {
+  const t = tasks.find(x => x.id === id);
+  if (t) { t.status = t.status === 'completed' ? 'active' : 'completed'; renderTasks(tasks); showToast('Cập nhật trạng thái nhiệm vụ!', 'success'); }
+}
+
+// ══════════════════════════════
+// CRUD - PROJECTS (SPONSOR)
+// ══════════════════════════════
+function addProject() {
+  const name = document.getElementById('projName').value.trim();
+  if (!name) { showToast('Vui lòng nhập tên dự án!', 'error'); return; }
+  projects.unshift({
+    id: Date.now(), name,
+    type: document.getElementById('projType').value,
+    loc: document.getElementById('projLoc').value || 'Chưa xác định',
+    budget: document.getElementById('projBudget').value || '0',
+    vols: 0, progress: 0,
+    desc: document.getElementById('projGoal').value || 'Đang cập nhật...',
+    status: 'pending'
+  });
+  renderProjects();
+  closeModal('addProjectModal');
+  document.getElementById('projName').value = '';
+  showToast(`Đề xuất dự án "${name}" đã được gửi!`, 'success');
+}
+
+// ══════════════════════════════
+// DELETE
+// ══════════════════════════════
+function deleteItem(type, id, msg) {
+  deleteTarget = id;
+  deleteType = type;
+  document.getElementById('deleteMsg').innerHTML = msg || 'Bạn có chắc muốn xóa mục này?';
+  showModal('deleteModal');
+}
+
+function confirmDelete() {
+  if (deleteType === 'vol') { volunteers = volunteers.filter(x => x.id !== deleteTarget); renderVolunteers(volunteers); updateStats(); }
+  else if (deleteType === 'camp') { campaigns = campaigns.filter(x => x.id !== deleteTarget); renderCampaigns(campaigns); updateStats(); }
+  else if (deleteType === 'sponsor') { sponsors = sponsors.filter(x => x.id !== deleteTarget); renderSponsors(sponsors); }
+  else if (deleteType === 'task') { tasks = tasks.filter(x => x.id !== deleteTarget); renderTasks(tasks); }
+  else if (deleteType === 'proj') { projects = projects.filter(x => x.id !== deleteTarget); renderProjects(); }
+  closeModal('deleteModal');
+  showToast('Đã xóa thành công!', 'success');
+}
+
+// ══════════════════════════════
+// FILTER
+// ══════════════════════════════
+function filterVolunteers(q) {
+  const filtered = volunteers.filter(v => v.name.toLowerCase().includes(q.toLowerCase()) || v.email.toLowerCase().includes(q.toLowerCase()));
+  renderVolunteers(filtered);
+}
+
+function filterVolByStatus(s) {
+  const filtered = s ? volunteers.filter(v => v.status === s) : volunteers;
+  renderVolunteers(filtered);
+}
+
+// ══════════════════════════════
+// STATS
+// ══════════════════════════════
+function updateStats() {
+  document.getElementById('statVols').textContent = volunteers.filter(v => v.status !== 'pending').length;
+  document.getElementById('statCamp').textContent = campaigns.filter(c => c.status === 'active').length;
+  updatePendingBadge();
+}
+
+// ══════════════════════════════
+// MODAL
+// ══════════════════════════════
+function showModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+  });
+});
+
+// ══════════════════════════════
+// TOAST
+// ══════════════════════════════
+function showToast(msg, type = 'success') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}" style="color:var(--${type === 'success' ? 'green' : 'coral'}-600)"></i> ${msg}`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3500);
+}
+
+// ══════════════════════════════
+// INIT
+// ══════════════════════════════
+showPage('dashboard');
+updateStats();
+</script>
+</body>
+</html>
